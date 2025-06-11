@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Precificação</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-calculator"></i> Sistema de Precificação</h1>
+                <p>Calcule preços justos e lucrativos para seus trabalhos</p>
+                <button id="theme-toggle" class="theme-toggle" title="Alternar tema">
+                    <i class="fas fa-sun" id="theme-icon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="calculadora">
+                <i class="fas fa-calculator"></i> Calculadora
+            </button>
+            <button class="tab-btn" data-tab="historico">
+                <i class="fas fa-history"></i> Histórico
+            </button>
+            <button class="tab-btn" data-tab="relatorios">
+                <i class="fas fa-chart-bar"></i> Relatórios
+            </button>
+            <button class="tab-btn" data-tab="configuracoes">
+                <i class="fas fa-cog"></i> Configurações
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Calculadora Tab -->
+            <div id="calculadora" class="tab-content active">
+                <div class="calculator-grid">
+                    <div class="left-panel">
+                        <!-- Informações do Projeto -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Informações do Projeto</h3>
+                                <p>Dados básicos do trabalho a ser orçado</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="cliente">Cliente</label>
+                                        <input type="text" id="cliente" placeholder="Nome do cliente">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="categoria">Categoria</label>
+                                        <select id="categoria">
+                                            <option value="">Selecione uma categoria</option>
+                                            <option value="artesanato">Artesanato</option>
+                                            <option value="costura">Costura</option>
+                                            <option value="marcenaria">Marcenaria</option>
+                                            <option value="pintura">Pintura</option>
+                                            <option value="design">Design</option>
+                                            <option value="consultoria">Consultoria</option>
+                                            <option value="outros">Outros</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="descricao">Descrição do Trabalho</label>
+                                    <textarea id="descricao" rows="3" placeholder="Descreva detalhadamente o trabalho a ser realizado"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Materiais -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Materiais e Insumos</h3>
+                                <button id="add-material" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Adicionar
+                                </button>
+                            </div>
+                            <div class="card-content">
+                                <div id="materials-list">
+                                    <p class="empty-state">Nenhum material adicionado</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mão de Obra -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Mão de Obra</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="horas">Horas Trabalhadas</label>
+                                        <input type="number" id="horas" min="0" step="0.5" value="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="valor-hora">Valor por Hora (R$)</label>
+                                        <input type="number" id="valor-hora" min="0" step="0.01" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="right-panel">
+                        <!-- Configurações de Preço -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Configurações de Preço</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label for="margem-lucro">Margem de Lucro (%)</label>
+                                    <input type="number" id="margem-lucro" min="0" max="100" value="30">
+                                </div>
+                                <div class="form-group">
+                                    <label for="impostos">Impostos (%)</label>
+                                    <input type="number" id="impostos" min="0" max="100" step="0.01" value="8">
+                                </div>
+                                <div class="form-group">
+                                    <label for="despesas-fixas">Despesas Fixas (R$)</label>
+                                    <input type="number" id="despesas-fixas" min="0" step="0.01" value="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Resumo do Orçamento -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Resumo do Orçamento</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="summary-item">
+                                    <span>Materiais:</span>
+                                    <span id="total-materiais">R$ 0,00</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span>Mão de Obra:</span>
+                                    <span id="total-mao-obra">R$ 0,00</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span>Despesas Fixas:</span>
+                                    <span id="total-despesas">R$ 0,00</span>
+                                </div>
+                                <hr>
+                                <div class="summary-item total">
+                                    <span>Custo Total:</span>
+                                    <span id="custo-total">R$ 0,00</span>
+                                </div>
+                                <div class="summary-item small">
+                                    <span>Margem de Lucro:</span>
+                                    <span id="valor-lucro">R$ 0,00</span>
+                                </div>
+                                <div class="summary-item small">
+                                    <span>Impostos:</span>
+                                    <span id="valor-impostos">R$ 0,00</span>
+                                </div>
+                                <hr>
+                                <div class="summary-item final">
+                                    <span>Preço Final:</span>
+                                    <span id="preco-final">R$ 0,00</span>
+                                </div>
+                                <button id="save-budget" class="btn btn-success full-width">
+                                    <i class="fas fa-save"></i> Salvar Orçamento
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Histórico Tab -->
+            <div id="historico" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Histórico de Orçamentos</h3>
+                        <button id="export-csv" class="btn btn-secondary">
+                            <i class="fas fa-download"></i> Exportar CSV
+                        </button>
+                    </div>
+                    <div class="card-content">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="search-budgets" placeholder="Buscar por cliente, descrição ou categoria...">
+                        </div>
+                        <div id="budgets-list">
+                            <p class="empty-state">Nenhum orçamento salvo ainda</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal de Detalhes -->
+                <div id="budget-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Detalhes do Orçamento</h3>
+                            <button class="modal-close">&times;</button>
+                        </div>
+                        <div class="modal-body" id="budget-details">
+                            <!-- Conteúdo será preenchido dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Relatórios Tab -->
+            <div id="relatorios" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Relatórios Financeiros</h3>
+                        <select id="period-filter">
+                            <option value="todos">Todos os períodos</option>
+                            <option value="7">Últimos 7 dias</option>
+                            <option value="30">Últimos 30 dias</option>
+                            <option value="90">Últimos 90 dias</option>
+                        </select>
+                    </div>
+                    <div class="card-content">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon blue">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h4 id="total-orcamentos">0</h4>
+                                    <p>Total de Orçamentos</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon green">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h4 id="valor-total">R$ 0,00</h4>
+                                    <p>Valor Total</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon purple">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h4 id="lucro-total">R$ 0,00</h4>
+                                    <p>Lucro Total</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon orange">
+                                    <i class="fas fa-calendar"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h4 id="ticket-medio">R$ 0,00</h4>
+                                    <p>Ticket Médio</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reports-grid">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4>Orçamentos por Categoria</h4>
+                                </div>
+                                <div class="card-content">
+                                    <div id="categories-chart">
+                                        <p class="empty-state">Nenhum dado disponível</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4>Top 5 Clientes</h4>
+                                </div>
+                                <div class="card-content">
+                                    <div id="top-clients">
+                                        <p class="empty-state">Nenhum dado disponível</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configurações Tab -->
+            <div id="configuracoes" class="tab-content">
+                <div class="settings-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Informações da Empresa</h3>
+                            <p>Configure os dados da sua empresa</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="empresa-nome">Nome da Empresa</label>
+                                    <input type="text" id="empresa-nome" placeholder="Nome da sua empresa">
+                                </div>
+                                <div class="form-group">
+                                    <label for="empresa-cnpj">CNPJ</label>
+                                    <input type="text" id="empresa-cnpj" placeholder="00.000.000/0000-00">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="empresa-endereco">Endereço</label>
+                                <textarea id="empresa-endereco" rows="2" placeholder="Endereço completo da empresa"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="empresa-telefone">Telefone</label>
+                                    <input type="text" id="empresa-telefone" placeholder="(00) 00000-0000">
+                                </div>
+                                <div class="form-group">
+                                    <label for="empresa-email">E-mail</label>
+                                    <input type="email" id="empresa-email" placeholder="contato@empresa.com">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Configurações Padrão</h3>
+                            <p>Defina valores padrão para novos orçamentos</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="config-margem">Margem de Lucro Padrão (%)</label>
+                                    <input type="number" id="config-margem" min="0" max="100" value="30">
+                                </div>
+                                <div class="form-group">
+                                    <label for="config-impostos">Impostos Padrão (%)</label>
+                                    <input type="number" id="config-impostos" min="0" max="100" step="0.01" value="8">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="config-valor-hora">Valor Hora Padrão (R$)</label>
+                                    <input type="number" id="config-valor-hora" min="0" step="0.01" value="50">
+                                </div>
+                                <div class="form-group">
+                                    <label for="config-despesas">Despesas Fixas Padrão (R$)</label>
+                                    <input type="number" id="config-despesas" min="0" step="0.01" value="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Backup e Restauração</h3>
+                            <p>Gerencie seus dados do sistema</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="backup-buttons">
+                                <button id="export-data" class="btn btn-secondary">
+                                    <i class="fas fa-download"></i> Exportar Dados
+                                </button>
+                                <button id="import-data" class="btn btn-secondary">
+                                    <i class="fas fa-upload"></i> Importar Dados
+                                </button>
+                                <button id="clear-data" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i> Limpar Todos os Dados
+                                </button>
+                            </div>
+                            <input type="file" id="import-file" accept=".json" style="display: none;">
+                        </div>
+                    </div>
+
+                    <div class="save-settings">
+                        <button id="save-settings" class="btn btn-success">
+                            <i class="fas fa-save"></i> Salvar Configurações
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
