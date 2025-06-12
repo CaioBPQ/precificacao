@@ -176,7 +176,7 @@ body {
   padding: 1.5rem;
   border-bottom: 1px solid var(--border-color);
   display: flex;
-  justify-content: between;
+  justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
@@ -315,8 +315,8 @@ body {
 /* Materials */
 .material-item {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr auto;
-  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Grid responsivo */
+  gap: 1rem;
   align-items: end;
   padding: 1rem;
   background: var(--bg-secondary);
@@ -324,13 +324,15 @@ body {
   margin-bottom: 1rem;
 }
 
-.material-item input {
-  margin-bottom: 0;
+.material-item .form-group {
+    margin-bottom: 0; /* Remove a margem extra dentro do item */
 }
+
 
 .material-item .btn {
   padding: 8px;
   min-width: auto;
+  align-self: end; /* Alinha o botão de remover ao final */
 }
 
 /* Summary */
@@ -758,8 +760,11 @@ body {
   }
 
   .material-item {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    grid-template-columns: 1fr 1fr; /* Duas colunas em telas menores */
+  }
+
+  .material-item .form-group:first-child {
+      grid-column: 1 / -1; /* Ocupa a linha inteira para o nome do material */
   }
 
   .stats-grid {
