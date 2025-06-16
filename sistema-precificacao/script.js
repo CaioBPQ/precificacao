@@ -1,5 +1,37 @@
 // Sistema de Precificação - JavaScript Vanilla
 class PricingSystem {
+editBudget(id) {
+    const budget = this.budgets.find(b => b.id === id);
+    if (!budget) return;
+
+    this.editingId = id;
+
+    // Preenche os campos principais
+    document.getElementById("cliente").value = budget.client;
+    document.getElementById("descricao").value = budget.description;
+    document.getElementById("categoria").value = budget.category;
+    document.getElementById("horas").value = budget.hours;
+    document.getElementById("valor-hora").value = budget.hourlyRate;
+    document.getElementById("margem-lucro").value = budget.profitMargin;
+    document.getElementById("impostos").value = budget.taxes;
+    document.getElementById("despesas-fixas").value = budget.fixedCosts;
+
+    // Preenche os materiais
+    this.materials = budget.materials.map(material => ({ ...material })); // Deep copy
+    this.renderMaterials();
+
+    this.updateCalculations();
+
+    // Muda texto do botão
+    const saveBtn = document.getElementById("save-budget");
+    saveBtn.textContent = "Atualizar Orçamento";
+    saveBtn.classList.remove("btn-success");
+    saveBtn.classList.add("btn-warning");
+
+    // Troca pra aba Calculadora
+    this.switchTab("calculadora");
+}
+
   constructor() {
     this.materials = [];
     this.budgets = this.loadBudgets();
@@ -287,40 +319,56 @@ class PricingSystem {
   }
 
   // Budget Management
-  saveBudget() {
-    const client = document.getElementById("cliente").value.trim();
-    const description = document.getElementById("descricao").value.trim();
-    const category = document.getElementById("categoria").value;
+saveBudget() {
+  const client = document.getElementById("cliente").value.trim();
+  const description = document.getElementById("descricao").value.trim();
+  const category = document.getElementById("categoria").value;
 
-    if (!client || !description) {
-      this.showToast("Preencha pelo menos o cliente e a descrição do trabalho", "error");
-      return;
-    }
-
-    const calculations = this.updateCalculations();
-    const budget = {
-      id: Date.now().toString(),
-      client,
-      description,
-      category,
-      materials: JSON.parse(JSON.stringify(this.materials)), // Deep copy
-      hours: Number.parseFloat(document.getElementById("horas").value) || 0,
-      hourlyRate: Number.parseFloat(document.getElementById("valor-hora").value) || 0,
-      profitMargin: Number.parseFloat(document.getElementById("margem-lucro").value) || 0,
-      taxes: Number.parseFloat(document.getElementById("impostos").value) || 0,
-      fixedCosts: Number.parseFloat(document.getElementById("despesas-fixas").value) || 0,
-      totalCost: calculations.totalCost,
-      finalPrice: calculations.finalPrice,
-      date: new Date().toISOString(),
-    };
-
-    this.budgets.push(budget);
-    this.saveBudgets();
-    this.showToast("Orçamento salvo com sucesso!", "success");
-    this.clearForm();
-    this.renderBudgetsList();
-    this.updateReports();
+  if (!client || !description) {
+    this.showToast("Preencha pelo menos o cliente e a descrição do trabalho", "error");
+    return;
   }
+
+  // Se estiver editando um orçamento existente, remove o antigo antes de salvar
+  if (this.editingId) {
+    const existingIndex = this.budgets.findIndex(b => b.id === this.editingId);
+    if (existingIndex !== -1) {
+      this.budgets.splice(existingIndex, 1);
+    }
+  }
+
+  const calculations = this.updateCalculations();
+  const budget = {
+    id: this.editingId || Date.now().toString(), // Mantém o ID original se for edição
+    client,
+    description,
+    category,
+    materials: JSON.parse(JSON.stringify(this.materials)), // Deep copy dos materiais
+    hours: Number.parseFloat(document.getElementById("horas").value) || 0,
+    hourlyRate: Number.parseFloat(document.getElementById("valor-hora").value) || 0,
+    profitMargin: Number.parseFloat(document.getElementById("margem-lucro").value) || 0,
+    taxes: Number.parseFloat(document.getElementById("impostos").value) || 0,
+    fixedCosts: Number.parseFloat(document.getElementById("despesas-fixas").value) || 0,
+    totalCost: calculations.totalCost,
+    finalPrice: calculations.finalPrice,
+    date: new Date().toISOString(),
+  };
+
+  this.budgets.push(budget);
+  this.saveBudgets();
+  this.showToast(this.editingId ? "Orçamento atualizado com sucesso!" : "Orçamento salvo com sucesso!", "success");
+
+  // Reseta o modo edição
+  this.editingId = null;
+  const saveBtn = document.getElementById("save-budget");
+  saveBtn.textContent = "Salvar Orçamento";
+  saveBtn.classList.remove("btn-warning");
+  saveBtn.classList.add("btn-success");
+
+  this.clearForm();
+  this.renderBudgetsList();
+  this.updateReports();
+}
 
   clearForm() {
     document.getElementById("cliente").value = "";
@@ -449,6 +497,9 @@ class PricingSystem {
                     <div class="budget-actions">
                         <button class="btn btn-secondary" onclick="pricingSystem.viewBudgetDetails('${budget.id}')">
                             <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-primary" onclick="pricingSystem.editBudget('${budget.id}')">
+                            <i class="fas fa-pen"></i>
                         </button>
                         <button class="btn btn-danger" onclick="pricingSystem.deleteBudget('${budget.id}')">
                             <i class="fas fa-trash"></i>
