@@ -15,6 +15,7 @@ editBudget(id) {
     document.getElementById("margem-lucro").value = budget.profitMargin;
     document.getElementById("impostos").value = budget.taxes;
     document.getElementById("despesas-fixas").value = budget.fixedCosts;
+    document.getElementById("rendimento").value = budget.rendimento || "";
 
     // Preenche os materiais
     this.materials = budget.materials.map(material => ({ ...material })); // Deep copy
@@ -343,6 +344,7 @@ saveBudget() {
     client,
     description,
     category,
+    rendimento: document.getElementById("rendimento").value.trim(),
     materials: JSON.parse(JSON.stringify(this.materials)), // Deep copy dos materiais
     hours: Number.parseFloat(document.getElementById("horas").value) || 0,
     hourlyRate: Number.parseFloat(document.getElementById("valor-hora").value) || 0,
@@ -411,7 +413,10 @@ saveBudget() {
 
     details.innerHTML = `
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
-                <div>
+                
+            <p><strong>Rendimento:</strong> ${budget.rendimento || "Não informado"}</p>
+
+                  <div>
                     <h4 style="margin-bottom: 1rem;">Informações Gerais</h4>
                     <div style="font-size: 0.9rem; line-height: 1.6;">
                         <p><strong>Cliente:</strong> ${budget.client}</p>
